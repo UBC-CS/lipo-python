@@ -46,3 +46,35 @@ def LIPO(f, bounds, k, n, seq_out=False):
     else:
         return x[np.array(y).argmin()]
         
+def PRS(f, bounds, n, seq_out=False):
+    """
+    Pure Random Search
+    
+    Parameters
+    ----------
+     - f:      the (expensive) function to be minimized
+     - bounds: list of tuples containing boundaries defining the domain of f 
+     - n:      number of iterations to perform
+    Returns
+    ------
+     - x within bounds that returned smallest value f(x)
+    """
+    
+    y = []
+    x = []
+    best = []
+    
+    bound_mins = np.array([bnd[0] for bnd in bounds])
+    bound_maxs = np.array([bnd[1] for bnd in bounds])
+    
+    for t in np.arange(n):
+        u = np.random.uniform(size=len(bounds))
+        x_prop = u * (bound_maxs - bound_mins) + bound_mins
+        x.append(x_prop)
+        y.append(f(x_prop))
+        best.append(np.min(y))
+        
+    if seq_out:
+        return np.array(best).reshape(n)
+    else:
+        return x[np.array(y).argmin()]
