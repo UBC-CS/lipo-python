@@ -2,20 +2,6 @@
 
 import numpy as np
 
-def lower_bound(x_prop, y, x, k):
-    """
-    Parameters
-    ----------
-     - x_prop: candidate point at which to evaluate f
-     - y:      values of f already seen
-     - x:      values in domain correponding to y
-     - k:      lipschitz constant of f
-    Returns
-    -------
-     - lower bound on f 
-    """
-    return np.max(y - k * np.linalg.norm(x_prop - x))
-
 def LIPO(f, bounds, k, n, seq_out=False):
     """
     Parameters
@@ -42,6 +28,8 @@ def LIPO(f, bounds, k, n, seq_out=False):
     
     x.append(x_prop)
     y.append(f(x[0]))
+
+    lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
     
     # iteration
     for t in np.arange(n):
@@ -50,10 +38,11 @@ def LIPO(f, bounds, k, n, seq_out=False):
         if lower_bound(x_prop, y, x, k) <= np.min(y):
             x.append(x_prop)
             y.append(f(x_prop))
-        best.append(x[np.array(y).argmin()])
+        best.append(np.min(y))
             
     # output
     if seq_out:
         return np.array(best).reshape(n)
     else:
         return x[np.array(y).argmin()]
+        
