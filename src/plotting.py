@@ -1,4 +1,6 @@
-#!usr/bin/env python
+"""
+Utility for plotting loss versus number iterations
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -52,7 +54,8 @@ def loss_v_iter(loss, color, names, filename=None, q=(5,95), figsize=(10,5)):
         ax.set(xlabel='Iteration Number', ylabel='Error')
 
     plt.legend(names)
-    plt.show()
     if filename:
         fig = ax.get_figure()
-        fig.savefig(filename);
+        fig.savefig(filename)
+    else:
+        plt.show();
