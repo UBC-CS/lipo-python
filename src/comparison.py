@@ -10,12 +10,12 @@
 from sequential import lipo, prs
 from plotting import loss_v_iter
 
-from scipy.optimize import minimize
 import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('filename', type=str)
+parser.add_argument('--filename', type=str)
+parser.add_argument('--function', type=str)
 parser.add_argument('--num_sim', type=int, default=20)
 parser.add_argument('--num_iter', type=int, default=100)
 args = parser.parse_args()
@@ -24,11 +24,19 @@ args = parser.parse_args()
 # THE BOUNDS, FUNCTION, AND MINIMUM SHOULD BE ARGUMENTS #
 #-------------------------------------------------------#
 
-def g(x):
-    return (np.cos(x) + 2*np.cos(np.pi*x) - np.sin(np.pi/2*x))
+if args.function == "holder_table":
 
-bnds = [(0,4*np.pi)]
-scipy_min = minimize(g, np.array([9]), bounds=bnds).fun
+    def f(x):
+        inside_exp = np.abs(1-np.sqrt(x[0]*x[0]+x[1]*x[1])/np.pi)
+        return -np.abs(np.sin(x[0])*np.cos(x[1])*np.exp(inside_exp))
+
+    k = 40
+    bnds = [(-10,10),(-10,10)]
+
+# an even simpler 1-d example
+#def g(x):
+#    return (np.cos(x) + 2*np.cos(np.pi*x) - np.sin(np.pi/2*x))
+#bnds = [(0,4*np.pi)]
 
 #----------------------------------------------------#
 # THE SEQUENTIAL STRATEGIES SHOULD ALSO BE ARGUMENTS #
@@ -41,14 +49,14 @@ def main():
 
     for sim in np.arange(args.num_sim):
 
-        results_lipo[sim,:] = lipo(func=g, bounds=bnds, k=10, n=args.num_iter, seq_out=True)
-        results_prs[sim,:] = prs(func=g, bounds=bnds, n=args.num_iter, seq_out=True)
+        lipo_output = lipo(func=f, bounds=bnds, k=k, n=args.num_iter)
+        prs_output = prs(func=f, bounds=bnds, n=args.num_iter)
 
-    loss_lipo = np.abs(results_lipo - scipy_min)
-    loss_prs = np.abs(results_prs - scipy_min)
+        results_lipo[sim,:] = lipo_output['loss']
+        results_prs[sim,:] = prs_output['loss']
 
     loss_v_iter(
-        loss=[loss_lipo, loss_prs], 
+        loss=[results_lipo, results_prs], 
         names=['LIPO','PRS'],
         color=['blue', 'orange'], 
         figsize=(20,10), 
