@@ -4,7 +4,7 @@ Sequential algorithms for minimizing expensive functions
 
 import numpy as np
 
-def lipo(func, bounds, k, n, seq_out=False):
+def lipo(func, bounds, k, n):
     """
     Parameters
     ----------
@@ -41,14 +41,15 @@ def lipo(func, bounds, k, n, seq_out=False):
             x.append(x_prop)
             y.append(func(x_prop))
         best.append(np.min(y))
-            
-    # output
-    if seq_out:
-        return np.array(best).reshape(n)
-    else:
-        return x[np.array(y).argmin()]
+
+    output = {
+        'loss': np.array(best).reshape(n),
+        'x': np.array(x),
+        'y': np.array(y)
+    }
+    return output
         
-def prs(func, bounds, n, seq_out=False):
+def prs(func, bounds, n):
     """
     Pure Random Search
     
@@ -76,7 +77,9 @@ def prs(func, bounds, n, seq_out=False):
         y.append(func(x_prop))
         best.append(np.min(y))
         
-    if seq_out:
-        return np.array(best).reshape(n)
-    else:
-        return x[np.array(y).argmin()]
+    output = {
+        'loss': np.array(best).reshape(n),
+        'x': np.array(x),
+        'y': np.array(y)
+    }
+    return output
