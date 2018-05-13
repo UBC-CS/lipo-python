@@ -5,6 +5,20 @@ Utility for plotting loss versus number iterations
 import numpy as np
 import matplotlib.pyplot as plt
 
+# font control from here: https://stackoverflow.com/a/39566040/2566031
+
+SMALL_SIZE = 12
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 20
+
+plt.rc('font', size=SMALL_SIZE)
+plt.rc('axes', titlesize=SMALL_SIZE)
+plt.rc('axes', labelsize=MEDIUM_SIZE)
+plt.rc('xtick', labelsize=SMALL_SIZE)
+plt.rc('ytick', labelsize=SMALL_SIZE) 
+plt.rc('legend', fontsize=SMALL_SIZE)
+plt.rc('figure', titlesize=BIGGER_SIZE)
+
 def loss_v_iter(loss, color, names, filename=None, q=(5,95), figsize=(10,5)):
     """
     Utility function for plotting loss versus iterations in experiments.
