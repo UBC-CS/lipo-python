@@ -1,5 +1,5 @@
 """
-Sequential algorithms for minimizing expensive functions
+Sequential algorithms for maximizing expensive functions
 """
 
 import numpy as np
@@ -9,13 +9,13 @@ def lipo(func, bounds, k, n):
     """
     Parameters
     ----------
-     - func:   the (expensive) function to be minimized
+     - func:   the (expensive) function to be maximized
      - bounds: list of tuples containing boundaries defining the domain of f 
      - k:      the lipschitz constant of f
      - n:      number of iterations to perform
     Returns
     ------
-     - x within bounds that returned smallest value f(x)
+     - x within bounds that returned largest value f(x)
     """
     
     # initialization
@@ -32,16 +32,17 @@ def lipo(func, bounds, k, n):
     x.append(x_prop)
     y.append(func(x[0]))
 
-    lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
+    #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
+    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
     
     # iteration
     for t in np.arange(n):
         u = np.random.uniform(size=len(bounds))
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
-        if lower_bound(x_prop, y, x, k) <= np.min(y):
+        if upper_bound(x_prop, y, x, k) >= np.max(y):
             x.append(x_prop)
             y.append(func(x_prop))
-        best.append(np.min(y))
+        best.append(np.max(y))
 
     output = {
         'loss': np.array(best).reshape(n),
@@ -50,18 +51,18 @@ def lipo(func, bounds, k, n):
     }
     return output
         
-def prs(func, bounds, n):
+def pure_random_search(func, bounds, n):
     """
     Pure Random Search
     
     Parameters
     ----------
-     - func:   the (expensive) function to be minimized
+     - func:   the (expensive) function to be maximized
      - bounds: list of tuples containing boundaries defining the domain of f 
      - n:      number of iterations to perform
     Returns
     ------
-     - x within bounds that returned smallest value f(x)
+     - x within bounds that returned largest value f(x)
     """
     
     y = []
@@ -76,7 +77,7 @@ def prs(func, bounds, n):
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
         x.append(x_prop)
         y.append(func(x_prop))
-        best.append(np.min(y))
+        best.append(np.max(y))
         
     output = {
         'loss': np.array(best).reshape(n),
@@ -89,14 +90,14 @@ def adaptive_lipo(func, bounds, n, k_seq=np.logspace(-10,10,10000), p=0.5):
     """
     Parameters
     ----------
-     - func:   the (expensive) function to be minimized
+     - func:   the (expensive) function to be maximized
      - bounds: list of tuples containing boundaries defining the domain of f 
      - k_seq:  nondecreasing sequence of lipschitz constants
      - n:      number of iterations to perform
      - p:      parameter of the binomial dist. controlling exploration/exploitation
     Returns
     ------
-     - x within bounds that returned smallest value f(x)
+     - x within bounds that returned largest value f(x)
     """
 
     # initialization
@@ -114,7 +115,8 @@ def adaptive_lipo(func, bounds, n, k_seq=np.logspace(-10,10,10000), p=0.5):
     y.append(func(x[0]))
     k = 0
 
-    lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
+    #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
+    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
 
     for t in np.arange(n):
 
@@ -125,14 +127,14 @@ def adaptive_lipo(func, bounds, n, k_seq=np.logspace(-10,10,10000), p=0.5):
         # check if we are exploring or exploiting
         if not np.random.binomial(n=1, p=p):
             # exploiting - must ensure we're drawing from potential minimizers
-            while lower_bound(x_prop, y, x, k) > np.min(y):
+            while upper_bound(x_prop, y, x, k) < np.max(y):
                 u = np.random.uniform(size=len(bounds))
                 x_prop = u * (bound_maxs - bound_mins) + bound_mins
         
         # once settled on proposal add it to the seen points
         x.append(x_prop)
         y.append(func(x_prop))
-        best.append(np.min(y))
+        best.append(np.max(y))
 
         # update estimate of lipschitx constant
         # compute pairwise differences between y values
