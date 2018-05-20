@@ -86,7 +86,11 @@ def pure_random_search(func, bounds, n):
     }
     return output
 
-def adaptive_lipo(func, bounds, n, k_seq=np.logspace(-10,10,10000), p=0.5):
+def adaptive_lipo(func, 
+                  bounds, 
+                  n, 
+                  k_seq=np.array([(1 + (0.01/0.5))**i for i in range(-10000, 10000)]), 
+                  p=0.1):
     """
     Parameters
     ----------
@@ -154,3 +158,8 @@ def adaptive_lipo(func, bounds, n, k_seq=np.logspace(-10,10,10000), p=0.5):
         'y': np.array(y)
     }
     return output
+
+optimizers = {
+    'Adaptive LIPO': adaptive_lipo,
+    'Pure Random Search': pure_random_search
+}

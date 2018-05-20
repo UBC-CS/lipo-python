@@ -47,3 +47,11 @@ def deb_one(x):
     return (1/5)*np.sum(np.sin(5*np.pi*x)**6) 
 
 deb_one_bounds = [(-5,5), (-5,5), (-5,5), (-5,5), (-5,5)]
+
+synthetic_functions = {
+    'Holder Table' : {'func': holder_table, 'bnds': holder_bounds},
+    'Rosenbrock': {'func': rosenbrock, 'bnds': rosenbrock_bounds},
+    'Sphere': {'func': sphere, 'bnds': sphere_bounds},
+    'Linear Slope': {'func': linear_slope, 'bnds': linear_slope_bounds},
+    'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds}
+}
