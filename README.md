@@ -5,9 +5,11 @@ Implementing Global optimization of Lipschitz functions
 
 [Global optimization of Lipschitz functions](https://arxiv.org/abs/1703.02628).
 
+* C. Malherbe and N. Vayatis. "Global optimization of Lipschitz functions". ICML. 2314 - 2323. (2017)
+
 [BayesOpt](https://arxiv.org/abs/1405.7430)
 
-R. Martinez-Cantin. BayesOpt: {A} Bayesian Optimization Library for Nonlinear Optimization, Experimental Design and Bandits. CoRR. 1405.7430. (2014) 
+* R. Martinez-Cantin. BayesOpt: {A} Bayesian Optimization Library for Nonlinear Optimization, Experimental Design and Bandits. CoRR. 1405.7430. (2014) 
 
 [CMA-ES - Covariance Matrix Adaptation Evolution Strategy](https://www.researchgate.net/publication/227050324_The_CMA_Evolution_Strategy_A_Comparing_Review)
 
