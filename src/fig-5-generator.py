@@ -6,6 +6,7 @@ from objective_functions import synthetic_functions
 import numpy as np
 import argparse
 import pickle
+import pandas as pd
 from collections import defaultdict
 
 parser = argparse.ArgumentParser()
@@ -78,6 +79,16 @@ def main():
     # need to have recursive_dd defined on the other end
     with open(args.outputfile + '.pickle', 'wb') as place:
         pickle.dump(table, place, protocol=pickle.HIGHEST_PROTOCOL)
+
+    csv_table = recursive_dd()
+    for optimizer_name, contents in table.items():
+        for func_name, results in contents.items():
+            csv_table[optimizer_name][func_name] = str(results['mean']) + ' +/- {0:.01f}'.format(results['std'])
+
+    df = pd.DataFrame.from_dict(csv_table).T
+    df = df[['Holder Table', 'Rosenbrock', 'Linear Slope', 'Sphere', 'Deb N.1']]
+
+    df.to_csv(args.outputfile + '.csv')
 
 
 def recursive_dd():
