@@ -14,12 +14,11 @@ def holder_table(x):
 holder_bounds = [(-10,10),(-10,10)]
 
 def rosenbrock(x):
-    """x is a numpy array containing three numbers"""
-    if x.shape != (3,):
-        raise ValueError('Input array should be shape of (3,)')
+    if x.shape[0] != 3:
+        raise ValueError('Input array first dimension should be size 3')
     first = 100*(x[1] - x[0]**2)**2 + (x[0] - 1)**2
     second = 100*(x[2] - x[1]**2)**2 + (x[1] - 1)**2
-    return -np.sum(first + second)
+    return -(first + second)
 
 rosenbrock_bounds = [(-2.048,2.048), (-2.048,2.048), (-2.048,2.048)]
 

@@ -30,7 +30,7 @@ def main():
         for synthetic_name, synthetic_obj in synthetic_functions.items():
             # perform specified number of simulations
             for sim in np.arange(args.num_sim):
-
+                print(sim)
                 out = optimizer(func=synthetic_obj['func'], bounds=synthetic_obj['bnds'], n=args.num_iter)
 
                 results[optimizer_name][synthetic_name][sim] = out
