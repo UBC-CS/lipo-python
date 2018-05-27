@@ -40,7 +40,7 @@ def linear_slope(x):
 
 linear_slope_bounds = [(-5,5), (-5,5), (-5,5), (-5,5)]
 
-def vec_deb_one(x):
+def deb_one(x):
     if x.shape[0] != 5:
         raise ValueError('Input array first dimension should be of size 5')
     return (1/5)*np.sum(np.sin(5*np.pi*x)**6, axis=0) 
