@@ -45,7 +45,6 @@ def main():
         u = np.random.uniform(size=(num_samples, len(synthetic_obj['bnds'])))
         x_samples = u * (bound_maxs - bound_mins) + bound_mins
         
-        #y_samples = np.apply_along_axis(synthetic_obj['func'], axis=1, arr=x_samples)
         y_samples = synthetic_obj['func'](x_samples.T)
         synthetic_obj['avg'] = np.mean(y_samples)
 
