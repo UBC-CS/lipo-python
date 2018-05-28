@@ -8,7 +8,6 @@ import argparse
 import pickle
 import pandas as pd
 from collections import defaultdict
-from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--inputfile', type=str)
@@ -28,7 +27,7 @@ def main():
     for synthetic_name, synthetic_obj in synthetic_functions.items():
         all_max = []
         for optimizer_name, optimizer in optimizers.items():
-            N = len(results[optimizer_name][synthetic_name])
+            N = len(results[optimizer_name][synthetic_name]) # number of simulations
             for sim in np.arange(N):
                 all_max.append(np.max(results[optimizer_name][synthetic_name][sim]['y']))
         synthetic_obj['maximum'] = np.max(all_max)
@@ -37,14 +36,14 @@ def main():
     # as outlined on pagge 17-18 of the paper
     num_samples = 10**6
 
-    for synthetic_name, synthetic_obj in tqdm(synthetic_functions.items()):
+    for synthetic_name, synthetic_obj in synthetic_functions.items():
 
         bound_mins = np.array([bnd[0] for bnd in synthetic_obj['bnds']])
         bound_maxs = np.array([bnd[1] for bnd in synthetic_obj['bnds']])
 
         u = np.random.uniform(size=(num_samples, len(synthetic_obj['bnds'])))
         x_samples = u * (bound_maxs - bound_mins) + bound_mins
-        
+
         y_samples = synthetic_obj['func'](x_samples.T)
         synthetic_obj['avg'] = np.mean(y_samples)
 
@@ -52,8 +51,8 @@ def main():
     for synthetic_name, synthetic_obj in synthetic_functions.items():
         for optimizer_name, optimizer in optimizers.items():
             
-            N = len(results[optimizer_name][synthetic_name])
-            M = len(results[optimizer_name][synthetic_name][0]['y'])
+            N = len(results[optimizer_name][synthetic_name]) # number of simulations
+            M = len(results[optimizer_name][synthetic_name][0]['y']) # number of iterations
             cur_array = np.zeros((N, M))
             for sim in np.arange(N):
                 cur_array[sim,:] = results[optimizer_name][synthetic_name][sim]['y']
@@ -66,9 +65,21 @@ def main():
             target = cur_max - (cur_max - cur_avg) * (1 - args.target)
 
             # find the number of iterations it took to reach target
-            # note: shouldchange the hard coded 1000 to passed argument
-            loc_pass_target = np.argmax(cur_array >= target, axis=1)
-            loc_pass_target[loc_pass_target == 0] = 1000
+            # TODO: should change the hard coded 1000 to passed argument
+            loc_pass_target = np.zeros(N)
+            for i in range(N):
+                above = cur_array[i] >= target
+                if not np.any(above):
+                    loc_pass_target[i] = 1000
+                else:
+                    loc_pass_target[i] = np.min(np.nonzero(above)[0]) # minimum index of nonzero element
+
+            # the below code is broken because it sets the number of iterations to zero in the case
+            # that you reach the target on the first iteration
+            # (which, shockingly, happens somewhat frequently for these very easy targets)
+
+            # loc_pass_target = np.argmax(cur_array >= target, axis=1) # np.where, np.nonzero
+            # loc_pass_target[loc_pass_target == 0] = 1000
 
             # add the computed results to the dictionary that we will 
             # serialize and/or reformat to csv for writing
