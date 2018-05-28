@@ -12,7 +12,7 @@ Dockerfile, and running it interactively:
 ```
 git clone https://github.com/UBC-CS/lipo-python.git
 cd lipo-python
-docker build .
+docker build . -t lipo-python
 docker run -v <path-to-cloned-repo>/:/home/ -it lipo-python
 ```
 

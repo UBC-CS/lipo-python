@@ -1,9 +1,9 @@
-FROM ubuntu:latest
+FROM python:3
 
 WORKDIR ./home
 
 COPY . ./
-RUN apt-get update && \
-    apt-get -y install python-pip 
 
 RUN pip install -r requirements.txt
+
+ENTRYPOINT [ "bash" ]
