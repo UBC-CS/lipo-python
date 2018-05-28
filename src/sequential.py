@@ -4,6 +4,7 @@ Sequential algorithms for maximizing expensive functions
 
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
+from tqdm import trange
 
 def lipo(func, bounds, k, n):
     """
@@ -108,6 +109,8 @@ def adaptive_lipo(func,
     y = []
     x = []
     best = []
+    x_dist = []
+    y_dist = []
     
     bound_mins = np.array([bnd[0] for bnd in bounds])
     bound_maxs = np.array([bnd[1] for bnd in bounds])
@@ -122,7 +125,7 @@ def adaptive_lipo(func,
     #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
     upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
 
-    for t in np.arange(n):
+    for t in trange(n):
 
         # draw a uniformly distributed random variable
         u = np.random.uniform(size=len(bounds))
@@ -135,20 +138,27 @@ def adaptive_lipo(func,
                 u = np.random.uniform(size=len(bounds))
                 x_prop = u * (bound_maxs - bound_mins) + bound_mins
         
+        #new_x_distances = list(np.sqrt(np.sum((np.array(x) - x_prop)**2, axis=1)))
+        #x_dist.extend(new_x_distances)  
+
         # once settled on proposal add it to the seen points
         x.append(x_prop)
         y.append(func(x_prop))
         best.append(np.max(y))
 
+        #new_y_distances = list(np.abs(np.array(y[:-1]) - y[-1]))
+        #y_dist.extend(new_y_distances)
+        #k_est = np.max(np.array(y_dist) / np.array(x_dist))  
+        
         # update estimate of lipschitx constant
         # compute pairwise differences between y values
         y_outer = np.outer(np.ones(len(y)), y)
         y_diff = np.abs(y_outer - y_outer.T)
         # compute distance matrix between x values
-        x_dist = squareform(pdist(np.array(x)))
-        np.fill_diagonal(x_dist, np.Inf)
+        x_dist_square = squareform(pdist(np.array(x)))
+        np.fill_diagonal(x_dist_square, np.Inf)
         # estimate lipschitz constant
-        k_est = np.max(y_diff / x_dist)
+        k_est = np.max(y_diff / x_dist_square)
         k = k_seq[np.argmax(k_seq > k_est)]
 
 

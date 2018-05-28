@@ -8,6 +8,7 @@ import argparse
 import pickle
 import pandas as pd
 from collections import defaultdict
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--inputfile', type=str)
@@ -36,7 +37,7 @@ def main():
     # as outlined on pagge 17-18 of the paper
     num_samples = 10**6
 
-    for synthetic_name, synthetic_obj in synthetic_functions.items():
+    for synthetic_name, synthetic_obj in tqdm(synthetic_functions.items()):
 
         bound_mins = np.array([bnd[0] for bnd in synthetic_obj['bnds']])
         bound_maxs = np.array([bnd[1] for bnd in synthetic_obj['bnds']])
@@ -44,7 +45,7 @@ def main():
         u = np.random.uniform(size=(num_samples, len(synthetic_obj['bnds'])))
         x_samples = u * (bound_maxs - bound_mins) + bound_mins
         
-        y_samples = np.apply_along_axis(synthetic_obj['func'], axis=1, arr=x_samples)
+        y_samples = synthetic_obj['func'](x_samples.T)
         synthetic_obj['avg'] = np.mean(y_samples)
 
 
