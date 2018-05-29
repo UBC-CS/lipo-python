@@ -4,7 +4,6 @@ Sequential algorithms for maximizing expensive functions
 
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
-from tqdm import trange
 
 def lipo(func, bounds, k, n):
     """
@@ -125,7 +124,7 @@ def adaptive_lipo(func,
     #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
     upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
 
-    for t in trange(n):
+    for t in np.arange(n):
 
         # draw a uniformly distributed random variable
         u = np.random.uniform(size=len(bounds))
