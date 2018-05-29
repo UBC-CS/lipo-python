@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+
+    bayesopt:
+        build: ./src/bayesopt/
+    
+    lipo-python:
+        build: ./
+        volumes: 
+          - ./:/home/
