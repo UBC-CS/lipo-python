@@ -1,6 +1,21 @@
 # lipo-python
 Implementing Global optimization of Lipschitz functions
 
+## Using Docker
+
+Currently the Docker container is designed simply to allow execution of the scripts on a host that doesn't 
+have dependencies (eg, python or certain packages) available locally.
+
+The container can be used interactively at this point by cloning this repo, building the image from the 
+Dockerfile, and running it interactively:
+
+```
+git clone https://github.com/UBC-CS/lipo-python.git
+cd lipo-python
+docker build . -t lipo-python
+docker run -v <path-to-cloned-repo>/:/home/ -it lipo-python
+```
+
 ## Resources
 
 [Global optimization of Lipschitz functions](https://arxiv.org/abs/1703.02628).
