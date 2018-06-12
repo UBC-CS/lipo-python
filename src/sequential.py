@@ -169,6 +169,6 @@ def adaptive_lipo(func,
     return output
 
 optimizers = {
-    'Adaptive LIPO': adaptive_lipo,
-    'Pure Random Search': pure_random_search
+    'AdaLIPO': adaptive_lipo,
+    'PRS': pure_random_search
 }
