@@ -14,7 +14,7 @@ parser.add_argument('inputfile', type=str,
                     help='input file (results from running synthetic-comparison.py)')
 parser.add_argument('outputfile', type=str,
                     help='outputfile')
-parser.add_argument('--target', type=float,
+parser.add_argument('--target', type=float, default=0.9,
                     help='''float between 0 and 1 indicating target value we seek to 
                             reach in optimization process''')
 parser.add_argument('--num_sim', type=int, default=20,
