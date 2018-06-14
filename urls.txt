@@ -1,0 +1,3 @@
+https://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/auto-mpg.data
+http://archive.ics.uci.edu/ml/machine-learning-databases/00243/yacht_hydrodynamics.data
+https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.data
