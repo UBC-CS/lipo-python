@@ -1,6 +1,24 @@
 # lipo-python
 Implementing Global optimization of Lipschitz functions
 
+## Scripts
+
+The scripts that work (at least at time of writing) can be run with the following commands (from the root directory of the project).
+
+This one runs the sequential optimizers (add `--optimizer=PRS` if you only want random search):
+
+```
+python src/synthetic-comparison.py --filename=results/syn-results --num_sim=100 --num_iter=1000
+```
+
+This one produces parts of Figure 5 (which part is specified by the `--target` parameter):
+
+```
+python src/fig-5-generator.py --inputfile=results/syn-results.pkl --outputfile=fig5-90 --target=0.9
+```
+
+These commands are generating results for the __synthetic__ objective functions. The functionality to generate results corresponding to the 'real world' objective functions is currently being developed.
+
 ## Using Docker
 
 Currently the Docker container is designed simply to allow execution of the scripts on a host that doesn't 
