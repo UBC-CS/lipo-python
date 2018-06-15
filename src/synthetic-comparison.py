@@ -39,6 +39,9 @@ if __name__ == "__main__":
     
     if args.optimizer:
         seq_optimizers = {args.optimizer: optimizers[args.optimizer]}
+    else:
+        seq_optimizers = optimizers
+
 
     results = recursive_dd()
 
