@@ -14,31 +14,20 @@ import argparse
 import pickle
 from collections import defaultdict
 
-parser = argparse.ArgumentParser()
-parser.add_argument('outputfile', type=str,
-                    help='name of file to which we write results')
-parser.add_argument('--num_sim', type=int, default=20,
-                    help='number of runs of sequential optimizers to perform')
-parser.add_argument('--num_iter', type=int, default=100,
-                    help='number of iterations in each run of a sequential optimizer')
-parser.add_argument('--optimizer', type=str,
-                    help='sequential optimization algorithm to use',
-                    choices=['PRS', 'AdaLIPO'])
-args = parser.parse_args()
 
 def recursive_dd():
     return defaultdict(recursive_dd)
 
-if __name__ == "__main__":
+def main(outputfile, num_sim, num_iter, optimizer=""):
 
-    if args.num_sim < 1:
+    if num_sim < 1:
         raise RuntimeError('Number of simulations should be a positive integer')
         
-    if args.num_iter < 1:
+    if num_iter < 1:
         raise RuntimeError('Number of iterations should be a positive integer')
     
-    if args.optimizer:
-        seq_optimizers = {args.optimizer: optimizers[args.optimizer]}
+    if optimizer:
+        seq_optimizers = {optimizer: optimizers[optimizer]}
     else:
         seq_optimizers = optimizers
 
@@ -50,19 +39,32 @@ if __name__ == "__main__":
         # loop over the objective functions
         for synthetic_name, synthetic_obj in synthetic_functions.items():
             # perform specified number of simulations
-            for sim in np.arange(args.num_sim):
-
+            for sim in np.arange(num_sim):
                 out = optimizer(func=synthetic_obj['func'], 
                                 bounds=synthetic_obj['bnds'], 
-                                n=args.num_iter)
+                                n=num_iter)
                 results[optimizer_name][synthetic_name][sim] = out
     
     # serialize
     # note that if you want to load this serialized object you 
     # need to have recursive_dd defined on the other end
-    with open(args.outputfile + '.pkl', 'wb') as place:
+    with open(outputfile + '.pkl', 'wb') as place:
         pickle.dump(results, place, protocol=pickle.HIGHEST_PROTOCOL)
              
 
 
 
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument('outputfile', type=str,
+	                    help='name of file to which we write results')
+	parser.add_argument('--num_sim', type=int, default=20,
+	                    help='number of runs of sequential optimizers to perform')
+	parser.add_argument('--num_iter', type=int, default=100,
+	                    help='number of iterations in each run of a sequential optimizer')
+	parser.add_argument('--optimizer', type=str,
+	                    help='sequential optimization algorithm to use',
+	                    choices=['PRS', 'AdaLIPO'])
+	args = parser.parse_args()
+
+	main(args.outputfile, args.num_sim, args.num_iter, args.optimizer)

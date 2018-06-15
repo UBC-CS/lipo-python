@@ -124,6 +124,8 @@ def adaptive_lipo(func,
     #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
     upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
 
+    y_distances = np.zeros((n,n))
+    x_distances = np.zeros((n,n))+np.Inf
     for t in np.arange(n):
 
         # draw a uniformly distributed random variable
@@ -148,18 +150,29 @@ def adaptive_lipo(func,
         #new_y_distances = list(np.abs(np.array(y[:-1]) - y[-1]))
         #y_dist.extend(new_y_distances)
         #k_est = np.max(np.array(y_dist) / np.array(x_dist))  
-        
-        # update estimate of lipschitx constant
+
+        # update estimate of lipschitz constant
         # compute pairwise differences between y values
-        y_outer = np.outer(np.ones(len(y)), y)
-        y_diff = np.abs(y_outer - y_outer.T)
+        # the size of y is tx1
+        # print("A")
+        # y_outer = np.outer(np.ones(len(y)), y)
+        # y_diff = np.abs(y_outer - y_outer.T)
+        
+        # y_diff = squareform(pdist(np.array(y)[:,None]))
+        # y_distances[:t,:t] = squareform(pdist(np.array(y)[:,None], p=1))
+        y_distances[:t,:t] = np.abs(np.array(y[:-1]) - y[-1])
+
         # compute distance matrix between x values
+        # the size of x is txd
+        # print("B")
+        # should be O(dt^2)
         x_dist_square = squareform(pdist(np.array(x)))
         np.fill_diagonal(x_dist_square, np.Inf)
         # estimate lipschitz constant
-        k_est = np.max(y_diff / x_dist_square)
-        k = k_seq[np.argmax(k_seq > k_est)]
-
+        # print("C")
+        k_est = np.nanmax(y_diff / x_dist_square) # O(t^2) # max ==> nanmax
+        k = k_seq[np.argmax(k_seq > k_est)] # O(m)
+        # print("D")
 
     output = {
         'loss': np.array(best).reshape(n),
