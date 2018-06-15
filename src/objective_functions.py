@@ -3,6 +3,7 @@ Objective functions and domains for comparing the sequential algorithms
 """
 
 import numpy as np
+import pandas as pd
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import cross_validate
 
@@ -57,10 +58,19 @@ synthetic_functions = {
     'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds}
 }
 
+def get_data(path):
+    full = pd.read_csv(path)
+    y = full.ix[:, 0]
+    X = full.ix[:, range(1, len(full.columns))]
+    return X, y
+
 def kernel_ridge_CV(X, y, cv, params):
     """Kernel Ridge regression on an arbitrary dataset as a function
     of the gaussian kernel bandwidth and regularization strength"""
-
-    model = KernelRidge(kernel='rbf', alpha=params[0], gamma=params[1])
+    # switch from math land to code land
+    alpha = params[0]
+    gamma = 1/(2*params[1]**2)
+    # build model and do cross validation
+    model = KernelRidge(kernel='rbf', alpha=alpha, gamma=gamma)
     results = cross_validate(model, X, y, cv=cv)
     return np.mean(results['test_score'])
