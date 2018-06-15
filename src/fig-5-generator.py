@@ -10,13 +10,22 @@ import pandas as pd
 from collections import defaultdict
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--inputfile', type=str)
-parser.add_argument('--outputfile', type=str)
-parser.add_argument('--target', type=float)
+parser.add_argument('inputfile', type=str,
+                    help='input file (results from running synthetic-comparison.py)')
+parser.add_argument('outputfile', type=str,
+                    help='outputfile')
+parser.add_argument('--target', type=float, default=0.9,
+                    help='''float between 0 and 1 indicating target value we seek to 
+                            reach in optimization process''')
+parser.add_argument('--num_sim', type=int, default=20,
+                    help='number of simulations performed in synthetic-comparison.py')
 args = parser.parse_args()
 
-def main():
+def recursive_dd():
+    return defaultdict(recursive_dd)
 
+if __name__ == "__main__":
+    
     with open(args.inputfile , 'rb') as stuff:
         results = pickle.load(stuff)
 
@@ -70,7 +79,7 @@ def main():
             for i in range(N):
                 above = cur_array[i] >= target
                 if not np.any(above):
-                    loc_pass_target[i] = 1000
+                    loc_pass_target[i] = args.num_sim
                 else:
                     loc_pass_target[i] = np.min(np.nonzero(above)[0]) # minimum index of nonzero element
 
@@ -101,10 +110,4 @@ def main():
     df = df[['Holder Table', 'Rosenbrock', 'Linear Slope', 'Sphere', 'Deb N.1']]
 
     df.to_csv(args.outputfile + '.csv')
-
-
-def recursive_dd():
-    return defaultdict(recursive_dd)
-
-if __name__ == "__main__":
-    main()
+    
