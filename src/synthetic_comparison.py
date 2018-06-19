@@ -9,6 +9,7 @@
 from sequential import optimizers
 from objective_functions import synthetic_functions
 
+import os
 import numpy as np
 import argparse
 import pickle
@@ -60,16 +61,20 @@ def main(outputfile, num_sim, num_iter, optimizer):
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser()
-	parser.add_argument('outputfile', type=str,
-	                    help='name of file to which we write results')
-	parser.add_argument('--num_sim', type=int, default=20,
-	                    help='number of runs of sequential optimizers to perform')
-	parser.add_argument('--num_iter', type=int, default=100,
-	                    help='number of iterations in each run of a sequential optimizer')
-	parser.add_argument('--optimizer', type=str,
-	                    help='sequential optimization algorithm to use',
-	                    choices=['PRS', 'AdaLIPO'])
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('outputfile', type=str,
+                        help='name of file to which we write results')
+    parser.add_argument('--num_sim', type=int, default=20,
+                        help='number of runs of sequential optimizers to perform')
+    parser.add_argument('--num_iter', type=int, default=100,
+                        help='number of iterations in each run of a sequential optimizer')
+    parser.add_argument('--optimizer', type=str,
+                        help='sequential optimization algorithm to use',
+                        choices=['PRS', 'AdaLIPO'])
+    args = parser.parse_args()
+    
+    directory = os.path.dirname(args.outputfile)
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
 
-	main(args.outputfile, args.num_sim, args.num_iter, args.optimizer)
+    main(args.outputfile, args.num_sim, args.num_iter, args.optimizer)
