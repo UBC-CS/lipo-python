@@ -51,7 +51,7 @@ def lipo(func, bounds, k, n):
     }
     return output
         
-def pure_random_search(func, bounds, n):
+def pure_random_search(func, bounds, n, seed=None):
     """
     Pure Random Search
     
@@ -64,6 +64,7 @@ def pure_random_search(func, bounds, n):
     ------
      - x within bounds that returned largest value f(x)
     """
+    np.random.seed(seed)
     
     y = []
     x = []
@@ -90,7 +91,8 @@ def adaptive_lipo(func,
                   bounds, 
                   n, 
                   k_seq=np.array([(1 + (0.01/0.5))**i for i in range(-10000, 10000)]), 
-                  p=0.1):
+                  p=0.1,
+                  seed=None):
     """
     Parameters
     ----------
@@ -103,6 +105,7 @@ def adaptive_lipo(func,
     ------
      - x within bounds that returned largest value f(x)
     """
+    np.random.seed(seed)
 
     # initialization
     y = []
