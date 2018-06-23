@@ -65,26 +65,27 @@ def pure_random_search(func, bounds, n, seed=None):
      - x within bounds that returned largest value f(x)
     """
     np.random.seed(seed)
+
+    # dimension of the domain
+    d = len(bounds)
     
-    y = []
-    x = []
-    best = []
-    
+    # preallocate the output arrays
+    y = np.zeros(n) - np.Inf
+    x = np.zeros((n, d))
+    loss = np.zeros(n)
+
+    # the lower/upper bounds on each dimension
     bound_mins = np.array([bnd[0] for bnd in bounds])
     bound_maxs = np.array([bnd[1] for bnd in bounds])
     
     for t in np.arange(n):
-        u = np.random.uniform(size=len(bounds))
+        u = np.random.uniform(size=d)
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
-        x.append(x_prop)
-        y.append(func(x_prop))
-        best.append(np.max(y))
+        x[t] = x_prop
+        y[t] = func(x_prop)
+        loss[t] = np.max(y)
         
-    output = {
-        'loss': np.array(best).reshape(n),
-        'x': np.array(x),
-        'y': np.array(y)
-    }
+    output = {'loss': loss, 'x': x, 'y': y}
     return output
 
 def adaptive_lipo(func, 
@@ -135,7 +136,7 @@ def adaptive_lipo(func,
 
         # check if we are exploring or exploiting
         if not np.random.binomial(n=1, p=p):
-            # exploiting - must ensure we're drawing from potential minimizers
+            # exploiting - must ensure we're drawing from potential maximizers
             while upper_bound(x_prop, y, x, k) < np.max(y):
                 u = np.random.uniform(size=len(bounds))
                 x_prop = u * (bound_maxs - bound_mins) + bound_mins
@@ -152,7 +153,7 @@ def adaptive_lipo(func,
         #y_dist.extend(new_y_distances)
         #k_est = np.max(np.array(y_dist) / np.array(x_dist))  
         
-        # update estimate of lipschitx constant
+        # update estimate of lipschitz constant
         # compute pairwise differences between y values
         y_outer = np.outer(np.ones(len(y)), y)
         y_diff = np.abs(y_outer - y_outer.T)
