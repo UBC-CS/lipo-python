@@ -108,68 +108,69 @@ def adaptive_lipo(func,
     """
     np.random.seed(seed)
 
-    # initialization
-    y = []
-    x = []
-    best = []
-    x_dist = []
-    y_dist = []
+    # dimension of the domain
+    d = len(bounds)
+
+    # preallocate the output arrays
+    y = np.zeros(n) - np.Inf
+    x = np.zeros((n, d))
+    loss = np.zeros(n)
+
+    # preallocate the distance arrays
+    x_dist = np.zeros((n * (n - 1)) // 2)
+    y_dist = np.zeros((n * (n - 1)) // 2)
     
+    # the lower/upper bounds on each dimension
     bound_mins = np.array([bnd[0] for bnd in bounds])
     bound_maxs = np.array([bnd[1] for bnd in bounds])
     
-    u = np.random.uniform(size=len(bounds))
-    x_prop = u * (bound_maxs - bound_mins) + bound_mins
-    
-    x.append(x_prop)
-    y.append(func(x[0]))
+    # initialization with randomly drawn point in domain and k = 0
     k = 0
+    u = np.random.uniform(size=d)
+    x_prop = u * (bound_maxs - bound_mins) + bound_mins
+    x[0] = x_prop
+    y[0] = func(x_prop)
 
-    #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
     upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
 
-    for t in np.arange(n):
+    for t in np.arange(1, n):
 
         # draw a uniformly distributed random variable
-        u = np.random.uniform(size=len(bounds))
+        u = np.random.uniform(size=d)
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
 
         # check if we are exploring or exploiting
         if not np.random.binomial(n=1, p=p):
-            # exploiting - must ensure we're drawing from potential maximizers
-            while upper_bound(x_prop, y, x, k) < np.max(y):
-                u = np.random.uniform(size=len(bounds))
-                x_prop = u * (bound_maxs - bound_mins) + bound_mins
-        
-        #new_x_distances = list(np.sqrt(np.sum((np.array(x) - x_prop)**2, axis=1)))
-        #x_dist.extend(new_x_distances)  
+            # exploiting - ensure we're drawing from potential maximizers
+            while upper_bound(x_prop, y[:t], x[:t], k) < np.max(y):
+                u = np.random.uniform(size=d)
+                x_prop = u * (bound_maxs - bound_mins) + bound_mins 
 
-        # once settled on proposal add it to the seen points
-        x.append(x_prop)
-        y.append(func(x_prop))
-        best.append(np.max(y))
+        # add proposal to array of visited points
+        x[t] = x_prop
+        y[t] = func(x_prop)
+        loss[t] = np.max(y)
 
-        #new_y_distances = list(np.abs(np.array(y[:-1]) - y[-1]))
-        #y_dist.extend(new_y_distances)
-        #k_est = np.max(np.array(y_dist) / np.array(x_dist))  
-        
-        # update estimate of lipschitz constant
-        # compute pairwise differences between y values
-        y_outer = np.outer(np.ones(len(y)), y)
-        y_diff = np.abs(y_outer - y_outer.T)
-        # compute distance matrix between x values
-        x_dist_square = squareform(pdist(np.array(x)))
-        np.fill_diagonal(x_dist_square, np.Inf)
-        # estimate lipschitz constant
-        k_est = np.max(y_diff / x_dist_square)
+        # compute current number of tracked distances
+        old_num_dist = (t * (t - 1)) // 2
+
+        # compute distance between newl values and all 
+        # previously seen points - should be of shape (t,)
+        # then insert new distances into x_dist, y_dist resp.
+        new_x_dist = np.sqrt(np.sum((x[:t] - x_prop)**2, axis=1))
+        x_dist[old_num_dist:(old_num_dist + t)] = new_x_dist 
+
+        new_y_dist = np.abs(y[:t] - y[t])
+        y_dist[old_num_dist:(old_num_dist + t)] = new_y_dist
+
+        # compute new number of of tracked distances
+        # and update estimate of lipschitz constant
+        new_num_dist = old_num_dist + t
+        k_est = np.max(y_dist[:new_num_dist] / x_dist[:new_num_dist]) 
         k = k_seq[np.argmax(k_seq > k_est)]
 
 
-    output = {
-        'loss': np.array(best).reshape(n),
-        'x': np.array(x),
-        'y': np.array(y)
-    }
+    output = {'loss': loss, 'x': x, 'y': y}
     return output
 
 optimizers = {
