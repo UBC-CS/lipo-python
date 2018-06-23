@@ -20,7 +20,7 @@ from collections import defaultdict
 def recursive_dd():
     return defaultdict(recursive_dd)
 
-def main(outputfile, num_sim, num_iter, optimizer):
+def main(outputfile, num_sim, num_iter, optimizer, seed):
 
     if num_sim < 1:
         raise RuntimeError('Number of simulations should be a positive integer')
@@ -46,7 +46,8 @@ def main(outputfile, num_sim, num_iter, optimizer):
             for sim in tqdm(np.arange(num_sim), desc='Simulation', ncols=75):
                 out = optimizer(func=synthetic_obj['func'], 
                                 bounds=synthetic_obj['bnds'], 
-                                n=num_iter)
+                                n=num_iter,
+                                seed=seed)
                 results[optimizer_name][synthetic_name][sim] = out
     
     # serialize
@@ -71,10 +72,11 @@ if __name__ == "__main__":
     parser.add_argument('--optimizer', type=str,
                         help='sequential optimization algorithm to use',
                         choices=['PRS', 'AdaLIPO'])
+    parser.add_argument('--seed', type=int, default=None)
     args = parser.parse_args()
     
     directory = os.path.dirname(args.outputfile)
     if not os.path.isdir(directory):
         os.mkdir(directory)
 
-    main(args.outputfile, args.num_sim, args.num_iter, args.optimizer)
+    main(args.outputfile, args.num_sim, args.num_iter, args.optimizer, args.seed)
