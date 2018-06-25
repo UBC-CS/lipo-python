@@ -5,26 +5,27 @@ Implementing Global optimization of Lipschitz functions
 
 The scripts that work (at least at time of writing) can be run with the following commands (from the root directory of the project).
 
-This one runs the sequential optimizers (add `--optimizer=PRS` if you only want random search):
+This one runs the sequential optimizers (the `--synthetic` flag indicates that we 
+don't want to optimize the real world cros validation based functions):
 
 ```
-python src/synthetic-comparison.py --filename=results/syn-results --num_sim=100 --num_iter=1000
+python src/optimize.py results/syn-test --synthetic
 ```
 
-This one produces parts of Figure 5 (which part is specified by the `--target` parameter):
+This one produces parts of Figure 5 from the original paper:
 
 ```
-python src/fig-5-generator.py --inputfile=results/syn-results.pkl --outputfile=fig5-90 --target=0.9
+python src/figure_five.py results/syn-test.pkl results/syn-test
 ```
 
 These commands are generating results for the __synthetic__ objective functions. The functionality to generate results corresponding to the 'real world' objective functions is currently being developed.
 
 ## Using Docker
 
-Currently the Docker container is designed simply to allow execution of the scripts on a host that doesn't 
+Currently the Docker container is designed simply to allow execution of the scripts on a host that doesn't
 have dependencies (eg, python or certain packages) available locally.
 
-The container can be used interactively at this point by cloning this repo, building the image from the 
+The container can be used interactively at this point by cloning this repo, building the image from the
 Dockerfile, and running it interactively:
 
 ```
@@ -42,7 +43,7 @@ docker run -v <path-to-cloned-repo>/:/home/ -it lipo-python
 
 [BayesOpt](https://arxiv.org/abs/1405.7430)
 
-* R. Martinez-Cantin. BayesOpt: {A} Bayesian Optimization Library for Nonlinear Optimization, Experimental Design and Bandits. CoRR. 1405.7430. (2014) 
+* R. Martinez-Cantin. BayesOpt: {A} Bayesian Optimization Library for Nonlinear Optimization, Experimental Design and Bandits. CoRR. 1405.7430. (2014)
 
 [CMA-ES - Covariance Matrix Adaptation Evolution Strategy](https://www.researchgate.net/publication/227050324_The_CMA_Evolution_Strategy_A_Comparing_Review)
 
@@ -61,4 +62,3 @@ docker run -v <path-to-cloned-repo>/:/home/ -it lipo-python
 [MLSL - Multi-Level Single-Linkage](https://link.springer.com/article/10.1007/BF02592071)  
 
 * A. H. G. Rinnooy Kan and G. T. Timmer, "Stochastic global optimization methods," Mathematical Programming, vol. 39, p. 27-78 (1987). (Actually 2 papers — part I: clustering methods, p. 27, then part II: multilevel methods, p. 57.)
-
