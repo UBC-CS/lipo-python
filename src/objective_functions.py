@@ -74,3 +74,25 @@ def kernel_ridge_CV(X, y, cv, params):
     model = KernelRidge(kernel='rbf', alpha=alpha, gamma=gamma)
     results = cross_validate(model, X, y, cv=cv)
     return np.mean(results['test_score'])
+
+X_housing, y_housing = get_data('./data/clean/housing.csv')
+
+def housing(x):
+    return kernel_ridge_CV(X_housing, y_housing, 10, x)
+
+X_yacht, y_yacht = get_data('./data/clean/yacht_hydrodynamics.csv')
+
+def yacht(x): 
+    return kernel_ridge_CV(X_yacht, y_yacht, 10, x)
+
+real_bnds = [(-2, 4), (-5, 5)]
+
+objectives = {
+    'Holder Table': {'func': holder_table, 'bnds': holder_bounds},
+    'Rosenbrock': {'func': rosenbrock, 'bnds': rosenbrock_bounds},
+    'Linear Slope': {'func': linear_slope, 'bnds': linear_slope_bounds},
+    'Sphere': {'func': sphere, 'bnds': sphere_bounds},
+    'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds},
+    'Housing': {'func': housing, 'bnds': real_bnds},
+    'Yacht': {'func': housing, 'bnds': real_bnds}
+}
