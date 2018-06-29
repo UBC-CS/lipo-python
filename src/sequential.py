@@ -91,7 +91,6 @@ def pure_random_search(func, bounds, n, seed=None):
 def adaptive_lipo(func, 
                   bounds, 
                   n, 
-                  k_seq=np.array([(1 + (0.01/0.5))**i for i in range(-10000, 10000)]), 
                   p=0.1,
                   seed=None):
     """
@@ -110,6 +109,8 @@ def adaptive_lipo(func,
 
     # dimension of the domain
     d = len(bounds)
+
+    k_seq=(1+0.01/d)**np.arange(-10000,10000) # Page 16
 
     # preallocate the output arrays
     y = np.zeros(n) - np.Inf
@@ -140,7 +141,7 @@ def adaptive_lipo(func,
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
 
         # check if we are exploring or exploiting
-        if not np.random.binomial(n=1, p=p):
+        if np.random.rand() > p: # enter w/ prob (1-p)
             # exploiting - ensure we're drawing from potential maximizers
             while upper_bound(x_prop, y[:t], x[:t], k) < np.max(y):
                 u = np.random.rand(d)
@@ -167,7 +168,12 @@ def adaptive_lipo(func,
         # and update estimate of lipschitz constant
         new_num_dist = old_num_dist + t
         k_est = np.max(y_dist[:new_num_dist] / x_dist[:new_num_dist]) 
-        k = k_seq[np.argmax(k_seq > k_est)]
+        # get the smallest element of k_seq that is bigger than k_est
+        # note: we're using argmax to get the first occurrence
+        # note: this relies on k_seq being sorted in nondecreasing order
+        k = k_seq[np.argmax(k_seq >= k_est)]
+        # note: in the paper, k_seq is called k_i 
+        #       and k is called \hat{k}_t
 
 
     output = {'loss': loss, 'x': x, 'y': y}
