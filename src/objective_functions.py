@@ -34,19 +34,16 @@ sphere_bounds = [(0,1), (0,1), (0,1), (0,1)]
 def linear_slope(x):
     if x.shape[0] != 4:
         raise ValueError('Input array first dimension should be size 4)')
-    coef = np.array([10**((i - 1)/4) for i in np.arange(4)])
-    if len(x.shape) == 1:
-        out = np.sum(coef*x)
-    else:
-        out = np.sum(coef[:,None]*x, axis=0)
-    return out
+
+    coef = 10.0**(np.arange(4)/4)
+    return coef@(x-5)
 
 linear_slope_bounds = [(-5,5), (-5,5), (-5,5), (-5,5)]
 
 def deb_one(x):
     if x.shape[0] != 5:
         raise ValueError('Input array first dimension should be of size 5')
-    return (1/5)*np.sum(np.sin(5*np.pi*x)**6, axis=0) 
+    return (1/5)*np.sum(np.sin(5*np.pi*x)**6, axis=0)
 
 deb_one_bounds = [(-5,5), (-5,5), (-5,5), (-5,5), (-5,5)]
 
@@ -82,7 +79,7 @@ def housing(x):
 
 X_yacht, y_yacht = get_data('./data/clean/yacht_hydrodynamics.csv')
 
-def yacht(x): 
+def yacht(x):
     return kernel_ridge_CV(X_yacht, y_yacht, 10, x)
 
 real_bnds = [(-2, 4), (-5, 5)]
