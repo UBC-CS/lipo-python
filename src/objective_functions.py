@@ -84,12 +84,9 @@ def yacht(x):
 
 real_bnds = [(-2, 4), (-5, 5)]
 
-objectives = {
-    'Holder Table': {'func': holder_table, 'bnds': holder_bounds},
-    'Rosenbrock': {'func': rosenbrock, 'bnds': rosenbrock_bounds},
-    'Linear Slope': {'func': linear_slope, 'bnds': linear_slope_bounds},
-    'Sphere': {'func': sphere, 'bnds': sphere_bounds},
-    'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds},
+ml_functions = {
     'Housing': {'func': housing, 'bnds': real_bnds},
     'Yacht': {'func': housing, 'bnds': real_bnds}
 }
+
+objectives = {**synthetic_functions, **ml_functions}
