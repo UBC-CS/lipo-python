@@ -126,24 +126,24 @@ def adaptive_lipo(func,
     
     # initialization with randomly drawn point in domain and k = 0
     k = 0
-    u = np.random.uniform(size=d)
+    u = np.random.rand(d)
     x_prop = u * (bound_maxs - bound_mins) + bound_mins
     x[0] = x_prop
     y[0] = func(x_prop)
 
-    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
+    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x,axis=1))
 
     for t in np.arange(1, n):
 
         # draw a uniformly distributed random variable
-        u = np.random.uniform(size=d)
+        u = np.random.rand(d)
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
 
         # check if we are exploring or exploiting
         if not np.random.binomial(n=1, p=p):
             # exploiting - ensure we're drawing from potential maximizers
             while upper_bound(x_prop, y[:t], x[:t], k) < np.max(y):
-                u = np.random.uniform(size=d)
+                u = np.random.rand(d)
                 x_prop = u * (bound_maxs - bound_mins) + bound_mins 
 
         # add proposal to array of visited points
