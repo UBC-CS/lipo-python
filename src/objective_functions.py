@@ -50,8 +50,8 @@ deb_one_bounds = [(-5,5), (-5,5), (-5,5), (-5,5), (-5,5)]
 synthetic_functions = {
     'Holder Table' : {'func': holder_table, 'bnds': holder_bounds},
     'Rosenbrock': {'func': rosenbrock, 'bnds': rosenbrock_bounds},
-    'Sphere': {'func': sphere, 'bnds': sphere_bounds},
     'Linear Slope': {'func': linear_slope, 'bnds': linear_slope_bounds},
+    'Sphere': {'func': sphere, 'bnds': sphere_bounds},
     'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds}
 }
 
