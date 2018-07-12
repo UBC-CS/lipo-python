@@ -4,52 +4,6 @@ Sequential algorithms for maximizing expensive functions
 
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
-
-def lipo(func, bounds, k, n):
-    """
-    Parameters
-    ----------
-     - func:   the (expensive) function to be maximized
-     - bounds: list of tuples containing boundaries defining the domain of f 
-     - k:      the lipschitz constant of f
-     - n:      number of iterations to perform
-    Returns
-    ------
-     - x within bounds that returned largest value f(x)
-    """
-    
-    # initialization
-    y = []
-    x = []
-    best = []
-    
-    bound_mins = np.array([bnd[0] for bnd in bounds])
-    bound_maxs = np.array([bnd[1] for bnd in bounds])
-    
-    u = np.random.uniform(size=len(bounds))
-    x_prop = u * (bound_maxs - bound_mins) + bound_mins
-    
-    x.append(x_prop)
-    y.append(func(x[0]))
-
-    #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
-    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
-    
-    # iteration
-    for t in np.arange(n):
-        u = np.random.uniform(size=len(bounds))
-        x_prop = u * (bound_maxs - bound_mins) + bound_mins
-        if upper_bound(x_prop, y, x, k) >= np.max(y):
-            x.append(x_prop)
-            y.append(func(x_prop))
-        best.append(np.max(y))
-
-    output = {
-        'loss': np.array(best).reshape(n),
-        'x': np.array(x),
-        'y': np.array(y)
-    }
-    return output
         
 def pure_random_search(func, bounds, n, seed=None):
     """
