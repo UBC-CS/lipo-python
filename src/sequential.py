@@ -4,52 +4,6 @@ Sequential algorithms for maximizing expensive functions
 
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
-
-def lipo(func, bounds, k, n):
-    """
-    Parameters
-    ----------
-     - func:   the (expensive) function to be maximized
-     - bounds: list of tuples containing boundaries defining the domain of f 
-     - k:      the lipschitz constant of f
-     - n:      number of iterations to perform
-    Returns
-    ------
-     - x within bounds that returned largest value f(x)
-    """
-    
-    # initialization
-    y = []
-    x = []
-    best = []
-    
-    bound_mins = np.array([bnd[0] for bnd in bounds])
-    bound_maxs = np.array([bnd[1] for bnd in bounds])
-    
-    u = np.random.uniform(size=len(bounds))
-    x_prop = u * (bound_maxs - bound_mins) + bound_mins
-    
-    x.append(x_prop)
-    y.append(func(x[0]))
-
-    #lower_bound = lambda x_prop, y, x, k: np.max(y-k*np.linalg.norm(x_prop-x))
-    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
-    
-    # iteration
-    for t in np.arange(n):
-        u = np.random.uniform(size=len(bounds))
-        x_prop = u * (bound_maxs - bound_mins) + bound_mins
-        if upper_bound(x_prop, y, x, k) >= np.max(y):
-            x.append(x_prop)
-            y.append(func(x_prop))
-        best.append(np.max(y))
-
-    output = {
-        'loss': np.array(best).reshape(n),
-        'x': np.array(x),
-        'y': np.array(y)
-    }
-    return output
         
 def pure_random_search(func, bounds, n, seed=None):
     """
@@ -91,7 +45,6 @@ def pure_random_search(func, bounds, n, seed=None):
 def adaptive_lipo(func, 
                   bounds, 
                   n, 
-                  k_seq=np.array([(1 + (0.01/0.5))**i for i in range(-10000, 10000)]), 
                   p=0.1,
                   seed=None):
     """
@@ -111,6 +64,8 @@ def adaptive_lipo(func,
     # dimension of the domain
     d = len(bounds)
 
+    k_seq=(1+0.01/d)**np.arange(-10000,10000) # Page 16
+
     # preallocate the output arrays
     y = np.zeros(n) - np.Inf
     x = np.zeros((n, d))
@@ -126,24 +81,24 @@ def adaptive_lipo(func,
     
     # initialization with randomly drawn point in domain and k = 0
     k = 0
-    u = np.random.uniform(size=d)
+    u = np.random.rand(d)
     x_prop = u * (bound_maxs - bound_mins) + bound_mins
     x[0] = x_prop
     y[0] = func(x_prop)
 
-    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x))
+    upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x,axis=1))
 
     for t in np.arange(1, n):
 
         # draw a uniformly distributed random variable
-        u = np.random.uniform(size=d)
+        u = np.random.rand(d)
         x_prop = u * (bound_maxs - bound_mins) + bound_mins
 
         # check if we are exploring or exploiting
-        if not np.random.binomial(n=1, p=p):
+        if np.random.rand() > p: # enter w/ prob (1-p)
             # exploiting - ensure we're drawing from potential maximizers
             while upper_bound(x_prop, y[:t], x[:t], k) < np.max(y):
-                u = np.random.uniform(size=d)
+                u = np.random.rand(d)
                 x_prop = u * (bound_maxs - bound_mins) + bound_mins 
 
         # add proposal to array of visited points
@@ -167,7 +122,12 @@ def adaptive_lipo(func,
         # and update estimate of lipschitz constant
         new_num_dist = old_num_dist + t
         k_est = np.max(y_dist[:new_num_dist] / x_dist[:new_num_dist]) 
-        k = k_seq[np.argmax(k_seq > k_est)]
+        # get the smallest element of k_seq that is bigger than k_est
+        # note: we're using argmax to get the first occurrence
+        # note: this relies on k_seq being sorted in nondecreasing order
+        k = k_seq[np.argmax(k_seq >= k_est)]
+        # note: in the paper, k_seq is called k_i 
+        #       and k is called \hat{k}_t
 
 
     output = {'loss': loss, 'x': x, 'y': y}
