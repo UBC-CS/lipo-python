@@ -71,6 +71,7 @@ def adaptive_lipo(func,
     y = np.zeros(n) - np.Inf
     x = np.zeros((n, d))
     loss = np.zeros(n)
+    k_arr = np.zeros(n)
 
     # preallocate the distance arrays
     # x_dist = np.zeros((n * (n - 1)) // 2)
@@ -87,10 +88,12 @@ def adaptive_lipo(func,
     x_prop = u * (bound_maxs - bound_mins) + bound_mins
     x[0] = x_prop
     y[0] = func(x_prop)
+    k_arr[0] = k
 
     upper_bound = lambda x_prop, y, x, k: np.min(y+k*np.linalg.norm(x_prop-x,axis=1))
 
     for t in np.arange(1, n):
+        print('Iteration {}'.format(t))
 
         # draw a uniformly distributed random variable
         u = np.random.rand(d)
@@ -99,6 +102,7 @@ def adaptive_lipo(func,
         # check if we are exploring or exploiting
         if np.random.rand() > p: # enter to exploit w/ prob (1-p)
             # exploiting - ensure we're drawing from potential maximizers
+            print('Into the while...')
             while upper_bound(x_prop, y[:t], x[:t], k) < np.max(y[:t]):
                 u = np.random.rand(d)
                 x_prop = u * (bound_maxs - bound_mins) + bound_mins 
@@ -108,7 +112,7 @@ def adaptive_lipo(func,
                 # print(upper_bound(x_prop, y[:t], x[:t], k))
             #     print(np.max(y[:t]))
                 # print('------')
-            # print("BREAK")
+            print('Out of the while')
         else:
             pass 
             # we keep the randomly drawn point as our next iterate
@@ -147,10 +151,14 @@ def adaptive_lipo(func,
         # print(k)
         i_t = np.ceil(np.log(k_est)/np.log(1+alpha))
         k = (1+alpha)**i_t
+        print('Lipschitz Constant Estimate: {}'.format(k))
+        print('\n')
         # print(k)
         # print("----")
+        k_arr[t] = k
+        
 
-    output = {'loss': loss, 'x': x, 'y': y}
+    output = {'loss': loss, 'x': x, 'y': y, 'k': k_arr}
     return output
 
 optimizers = {
