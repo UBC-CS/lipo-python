@@ -47,12 +47,20 @@ def deb_one(x):
 
 deb_one_bounds = [(-5,5)]*5
 
+def parabola(x):
+    if x.shape[0] != 2:
+        raise ValueError('Input array first dimension should be of size 2')
+    return -(x[0]**2 + x[1]**2)
+
+parabola_bounds = [(-1,1)]*2
+
 synthetic_functions = {
     'Holder Table' : {'func': holder_table, 'bnds': holder_bounds},
     'Rosenbrock': {'func': rosenbrock, 'bnds': rosenbrock_bounds},
     'Linear Slope': {'func': linear_slope, 'bnds': linear_slope_bounds},
     'Sphere': {'func': sphere, 'bnds': sphere_bounds},
-    'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds}
+    'Deb N.1': {'func': deb_one, 'bnds': deb_one_bounds},
+    'Parabola': {'func': parabola, 'bnds': parabola_bounds}
 }
 
 def get_data(path):
