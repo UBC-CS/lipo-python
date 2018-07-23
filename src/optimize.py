@@ -50,7 +50,7 @@ if __name__ == "__main__":
                         help='type of objective functions to optimize',
                         choices=['Holder Table', 'Rosenbrock', 'Sphere', 
                                  'Linear Slope', 'Deb N.1', 'Housing', 'Yacht',
-                                 'Parabola'])
+                                 'Parabola', 'Paraboloid2d'])
     parser.add_argument('--synthetic', default=False, action='store_true')
     args = parser.parse_args()
 
